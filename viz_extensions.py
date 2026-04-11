@@ -8,6 +8,25 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
+def _apply_white_labels(fig: go.Figure) -> go.Figure:
+    """Ensure all common 2D chart text elements are white on dark backgrounds."""
+    fig.update_layout(
+        title_font=dict(color="white"),
+        legend=dict(font=dict(color="white"), title_font=dict(color="white")),
+        xaxis=dict(
+            color="white",
+            tickfont=dict(color="white"),
+            title_font=dict(color="white"),
+        ),
+        yaxis=dict(
+            color="white",
+            tickfont=dict(color="white"),
+            title_font=dict(color="white"),
+        ),
+    )
+    return fig
+
+
 def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
     """
     2D scatter: bill_length_mm vs bill_depth_mm, colored by species (interactive).
@@ -34,6 +53,7 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
         font=dict(color="white"),
         legend_title_text="Species",
     )
+    _apply_white_labels(fig)
 
     if not df.empty and "species" in df.columns:
         means = df.groupby("species", observed=True)[["bill_length_mm", "bill_depth_mm"]].mean()
@@ -50,7 +70,7 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
                     f"Mean bill length: {s1} {means.loc[s1, 'bill_length_mm']:.1f} mm vs "
                     f"{s2} {means.loc[s2, 'bill_length_mm']:.1f} mm (filtered data)."
                 ),
-                font=dict(size=11, color="#8b949e"),
+                font=dict(size=11, color="#ffffff"),
             )
     return fig
 
@@ -86,6 +106,7 @@ def create_bar_chart(df: pd.DataFrame, by: str = "island") -> go.Figure:
         showlegend=False,
     )
     fig.update_xaxes(title=by.replace("_", " ").title())
+    _apply_white_labels(fig)
     return fig
 
 
@@ -119,6 +140,7 @@ def create_distribution_plot(
         font=dict(color="white"),
         bargap=0.05,
     )
+    _apply_white_labels(fig)
     return fig
 
 
@@ -186,6 +208,7 @@ def create_pca_plot(df: pd.DataFrame) -> go.Figure:
         plot_bgcolor="#0d1117",
         font=dict(color="white"),
     )
+    _apply_white_labels(fig)
     # Explained variance is not passed in; annotate that PC axes come from standardized features
     fig.add_annotation(
         x=0.02,
@@ -194,7 +217,7 @@ def create_pca_plot(df: pd.DataFrame) -> go.Figure:
         yref="paper",
         showarrow=False,
         text="PCs computed from standardized bill + flipper + mass features.",
-        font=dict(size=11, color="#8b949e"),
+        font=dict(size=11, color="#ffffff"),
     )
     return fig
 
@@ -217,6 +240,7 @@ def create_kmeans_bill_scatter(df: pd.DataFrame) -> go.Figure:
         color_discrete_sequence=px.colors.qualitative.Vivid,
     )
     fig.update_layout(paper_bgcolor="#0d1117", plot_bgcolor="#0d1117", font=dict(color="white"))
+    _apply_white_labels(fig)
     return fig
 
 

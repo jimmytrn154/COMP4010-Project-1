@@ -30,6 +30,31 @@ st.markdown("""
         padding: 15px;
         border-radius: 10px;
     }
+    div[data-testid="stMetricLabel"],
+    label[data-testid="stMetricLabel"],
+    div[data-testid="stMetricLabel"] *,
+    label[data-testid="stMetricLabel"] *,
+    div[data-testid="stMetricLabel"] p,
+    label[data-testid="stMetricLabel"] p {
+        color: #ffffff !important;
+        opacity: 1 !important;
+    }
+    div[data-testid="stMetricValue"],
+    label[data-testid="stMetricValue"],
+    div[data-testid="stMetricValue"] *,
+    label[data-testid="stMetricValue"] *,
+    div[data-testid="stMetricValue"] p,
+    label[data-testid="stMetricValue"] p {
+        color: #ffffff !important;
+        opacity: 1 !important;
+    }
+    div[data-testid="stMetricDelta"],
+    label[data-testid="stMetricDelta"],
+    div[data-testid="stMetricDelta"] *,
+    label[data-testid="stMetricDelta"] * {
+        color: #ffffff !important;
+        opacity: 1 !important;
+    }
     .insight-box {
         background: linear-gradient(135deg, #1f6feb 0%, #3fb950 100%);
         padding: 20px;
@@ -86,6 +111,24 @@ def apply_ml_pipeline(df):
     loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
     return df, pca, loadings
 
+
+def _apply_white_labels(fig):
+    fig.update_layout(
+        title_font=dict(color='white'),
+        legend=dict(font=dict(color='white'), title_font=dict(color='white')),
+        xaxis=dict(
+            color='white',
+            tickfont=dict(color='white'),
+            title_font=dict(color='white'),
+        ),
+        yaxis=dict(
+            color='white',
+            tickfont=dict(color='white'),
+            title_font=dict(color='white'),
+        ),
+    )
+    return fig
+
 def plot_interactive_ml_scatter(df):
     # Tạo biểu đồ Scatter với trục x, y (Đât sẽ là 2 thành phần PCA)
     fig = px.scatter(
@@ -137,6 +180,7 @@ def plot_interactive_ml_scatter(df):
         plot_bgcolor='#0d1117',
         font=dict(color='white')
     )
+    _apply_white_labels(fig)
 
     fig.update_traces(marker=dict(line=dict(width=1, color='DarkSlateGrey')))
     return fig
@@ -242,7 +286,18 @@ def main():
         color_discrete_sequence=px.colors.qualitative.Vivid
     )
     fig_3d.update_traces(marker=dict(size=5, line=dict(width=1, color='DarkSlateGrey')))
-    fig_3d.update_layout(scene=dict(bgcolor='#0d1117'), paper_bgcolor='#0d1117', font=dict(color='white'))
+    fig_3d.update_layout(
+        scene=dict(
+            bgcolor='#0d1117',
+            xaxis=dict(color='white', title_font=dict(color='white'), tickfont=dict(color='white')),
+            yaxis=dict(color='white', title_font=dict(color='white'), tickfont=dict(color='white')),
+            zaxis=dict(color='white', title_font=dict(color='white'), tickfont=dict(color='white')),
+        ),
+        title_font=dict(color='white'),
+        legend=dict(font=dict(color='white'), title_font=dict(color='white')),
+        paper_bgcolor='#0d1117',
+        font=dict(color='white'),
+    )
     st.plotly_chart(fig_3d, use_container_width=True)
     
     st.header("1.1 Dashboard dynamics")
@@ -273,8 +328,23 @@ def main():
             title="Which physical traits drive the separation?",
             xaxis_title="Principal Component 1",
             yaxis_title="Principal Component 2",
-            xaxis=dict(range=[-1.2, 1.2], zerolinecolor='gray', showgrid=False),
-            yaxis=dict(range=[-1.2, 1.2], zerolinecolor='gray', showgrid=False),
+            xaxis=dict(
+                range=[-1.2, 1.2],
+                zerolinecolor='gray',
+                showgrid=False,
+                color='white',
+                tickfont=dict(color='white'),
+                title_font=dict(color='white'),
+            ),
+            yaxis=dict(
+                range=[-1.2, 1.2],
+                zerolinecolor='gray',
+                showgrid=False,
+                color='white',
+                tickfont=dict(color='white'),
+                title_font=dict(color='white'),
+            ),
+            title_font=dict(color='white'),
             width=700, height=500,
             paper_bgcolor='#0d1117',
             plot_bgcolor='#0d1117',
@@ -289,11 +359,13 @@ def main():
         fig_hist = px.histogram(df_ml, x='body_mass_g', color='species', barmode='overlay', title='Body Mass Distribution by Species',
                                color_discrete_sequence=px.colors.qualitative.Pastel)
         fig_hist.update_layout(paper_bgcolor='#0d1117', plot_bgcolor='#0d1117', font=dict(color='white'))
+        _apply_white_labels(fig_hist)
         st.plotly_chart(fig_hist, use_container_width=True)
     with col2:
         fig_scatter = px.scatter(df_ml, x='flipper_length_mm', y='body_mass_g', color='species', size='bill_ratio', hover_data=['island'],
                                  title='Flipper Length vs Body Mass', color_discrete_sequence=px.colors.qualitative.Pastel)
         fig_scatter.update_layout(paper_bgcolor='#0d1117', plot_bgcolor='#0d1117', font=dict(color='white'))
+        _apply_white_labels(fig_scatter)
         st.plotly_chart(fig_scatter, use_container_width=True)
 
 if __name__ == "__main__":
