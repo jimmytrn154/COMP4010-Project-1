@@ -10,6 +10,8 @@ import seaborn as sns
 import warnings
 warnings.filterwarnings('ignore')
 
+import viz_extensions as vext
+
 st.set_page_config(page_title="Palmer Penguins Insight Hub", layout="wide", page_icon="🐧")
 
 # Custom CSS for Premium Design
@@ -162,7 +164,18 @@ def main():
         (df_base['island'].isin(selected_islands)) &
         (df_base['sex'].isin(selected_sex))
     ].copy()
-    
+
+    _bm = filtered_df["body_mass_g"]
+    _lo, _hi = int(_bm.min()), int(_bm.max())
+    if _lo < _hi:
+        _mass_range = st.sidebar.slider("Body mass range (g)", _lo, _hi, (_lo, _hi))
+    else:
+        _mass_range = (_lo, _hi)
+    filtered_df = filtered_df[
+        (filtered_df["body_mass_g"] >= _mass_range[0])
+        & (filtered_df["body_mass_g"] <= _mass_range[1])
+    ].copy()
+
     if filtered_df.empty:
         st.warning("No data found for the selected filters.")
         return
@@ -182,7 +195,32 @@ def main():
     island_text = " and ".join(selected_islands) if len(selected_islands) <= 2 else "Multiple Islands"
     
     st.markdown(f'<div class="insight-box">💡 Insight: On {island_text}, the selected {species_text} penguins average {avg_mass_text} in mass.<br>Did you know that bill depth and flipper length play crucial roles in their cluster separation? Toggle the clusters below!</div>', unsafe_allow_html=True)
-    
+
+
+    st.markdown("---")
+    st.header("0. Core exploratory visualizations & narrative")
+    st.markdown(vext.build_story_markdown(filtered_df))
+    _row_a = st.columns(3)
+    with _row_a[0]:
+        st.plotly_chart(vext.create_scatter_plot(filtered_df), use_container_width=True)
+    with _row_a[1]:
+        st.plotly_chart(vext.create_bar_chart(filtered_df, "species"), use_container_width=True)
+    with _row_a[2]:
+        st.plotly_chart(vext.create_bar_chart(filtered_df, "island"), use_container_width=True)
+    _row_b = st.columns(2)
+    with _row_b[0]:
+        st.plotly_chart(
+            vext.create_distribution_plot(filtered_df, "flipper_length_mm"),
+            use_container_width=True,
+        )
+    with _row_b[1]:
+        st.plotly_chart(vext.create_pca_plot(df_ml), use_container_width=True)
+    st.caption(
+        "PCA plot uses PC1/PC2 from the same standardized features as the ML pipeline above. "
+        "`viz_extensions.run_kmeans()` mirrors KMeans+StandardScaler for reuse in notebooks or reports."
+    )
+    st.plotly_chart(vext.create_kmeans_bill_scatter(df_ml), use_container_width=True)
+
     # Core Visuals & ML Vis
     st.header("1. K-Means Clusters in 3D Original Feature Space")
     
