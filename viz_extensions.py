@@ -26,6 +26,12 @@ def _apply_white_labels(fig: go.Figure) -> go.Figure:
     )
     return fig
 
+SPECIES_COLORS = {
+    "Adelie": px.colors.qualitative.Bold[0],
+    "Chinstrap": px.colors.qualitative.Bold[1],
+    "Gentoo": px.colors.qualitative.Bold[2],
+}
+
 
 def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
     """
@@ -44,7 +50,7 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
             "bill_depth_mm": "Bill depth (mm)",
             "species": "Species",
         },
-        color_discrete_sequence=px.colors.qualitative.Safe,
+        color_discrete_map=SPECIES_COLORS,
     )
     fig.update_traces(marker=dict(size=10, opacity=0.85, line=dict(width=0.5, color="white")))
     fig.update_layout(
@@ -91,6 +97,10 @@ def create_bar_chart(df: pd.DataFrame, by: str = "island") -> go.Figure:
         return fig
     counts = df[by].value_counts().reset_index()
     counts.columns = [by, "count"]
+    kwargs = {}
+    if by == "species":
+        kwargs["color_discrete_map"] = SPECIES_COLORS
+
     fig = px.bar(
         counts,
         x=by,
@@ -98,6 +108,7 @@ def create_bar_chart(df: pd.DataFrame, by: str = "island") -> go.Figure:
         color=by,
         title=f"Penguin counts by {by.replace('_', ' ')}",
         labels={"count": "Count"},
+        **kwargs
     )
     fig.update_layout(
         paper_bgcolor="#0d1117",
@@ -132,7 +143,7 @@ def create_distribution_plot(
         histnorm=histnorm,
         title=f"Distribution of {col.replace('_', ' ')} (by species)",
         labels={col: col.replace("_", " ").replace(" mm", " (mm)").replace(" g", " (g)")},
-        color_discrete_sequence=px.colors.qualitative.Pastel,
+        color_discrete_map=SPECIES_COLORS,
     )
     fig.update_layout(
         paper_bgcolor="#0d1117",
@@ -200,7 +211,7 @@ def create_pca_plot(df: pd.DataFrame) -> go.Figure:
         hover_data=["island", "body_mass_g"],
         title="PCA: PC1 vs PC2 (color = species)",
         labels={"pca_1": "PC1", "pca_2": "PC2"},
-        color_discrete_sequence=px.colors.qualitative.Bold,
+        color_discrete_map=SPECIES_COLORS,
     )
     fig.update_traces(marker=dict(size=9, line=dict(width=0.5, color="white")))
     fig.update_layout(

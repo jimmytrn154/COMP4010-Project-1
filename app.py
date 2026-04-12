@@ -135,8 +135,8 @@ def plot_interactive_ml_scatter(df):
         df, 
         x="pca_1", 
         y="pca_2", 
-        color="species", 
-        symbol="ml_cluster", 
+        color="ml_cluster", 
+        symbol="species", 
         size="body_mass_g", 
         hover_name="species",
         hover_data={
@@ -150,7 +150,7 @@ def plot_interactive_ml_scatter(df):
         },
         title="PCA & K-Means Clustering of Palmer Penguins (Hover for Profile)",
         labels={"ml_cluster": "K-Means Cluster"},
-        color_discrete_sequence=px.colors.qualitative.Bold
+        color_discrete_sequence=px.colors.qualitative.Vivid
     )
 
     # Sliders/Buttons trực tiếp trong Plotly
@@ -357,13 +357,13 @@ def main():
     col1, col2 = st.columns(2)
     with col1:
         fig_hist = px.histogram(df_ml, x='body_mass_g', color='species', barmode='overlay', title='Body Mass Distribution by Species',
-                               color_discrete_sequence=px.colors.qualitative.Pastel)
+                               color_discrete_map=vext.SPECIES_COLORS)
         fig_hist.update_layout(paper_bgcolor='#0d1117', plot_bgcolor='#0d1117', font=dict(color='white'))
         _apply_white_labels(fig_hist)
         st.plotly_chart(fig_hist, use_container_width=True)
     with col2:
         fig_scatter = px.scatter(df_ml, x='flipper_length_mm', y='body_mass_g', color='species', size='bill_ratio', hover_data=['island'],
-                                 title='Flipper Length vs Body Mass', color_discrete_sequence=px.colors.qualitative.Pastel)
+                                 title='Flipper Length vs Body Mass', color_discrete_map=vext.SPECIES_COLORS)
         fig_scatter.update_layout(paper_bgcolor='#0d1117', plot_bgcolor='#0d1117', font=dict(color='white'))
         _apply_white_labels(fig_scatter)
         st.plotly_chart(fig_scatter, use_container_width=True)
